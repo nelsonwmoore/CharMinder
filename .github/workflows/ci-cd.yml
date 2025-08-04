@@ -34,16 +34,13 @@ jobs:
       with:
         version: "latest"
         
-    - name: Create virtual environment
-      run: uv venv --python ${{ matrix.python-version }}
-      
     - name: Install dependencies
       run: |
-        uv pip install -e ".[test]"
+        uv sync --extra test
         
     - name: Run tests with coverage
       run: |
-        pytest -v --tb=short
+        uv run pytest -v --tb=short
         
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.11'
@@ -83,9 +80,8 @@ jobs:
       
     - name: Run mypy (type checking)
       run: |
-        uv venv
-        uv pip install -e ".[test]"
-        uv tool run mypy --install-types --non-interactive src/
+        uv sync --extra test
+        uv run mypy --install-types --non-interactive src/
 
   build:
     name: Build Package
@@ -211,7 +207,7 @@ jobs:
       uses: astral-sh/setup-uv@v3
       
     - name: Install dependencies
-      run: uv pip install -e ".[test]"
+      run: uv sync --extra test
       
     - name: Run safety check
       run: |
