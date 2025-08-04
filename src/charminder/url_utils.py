@@ -1,0 +1,48 @@
+"""URL handling and remote file operations."""
+
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+from urllib.parse import urlparse
+
+import requests
+
+
+def convert_github_url(url: str) -> str:
+    """Convert a GitHub blob URL to a raw URL."""
+    parsed_url = urlparse(url)
+    if parsed_url.netloc == "github.com":
+        parts = parsed_url.path.strip("/").split("/")
+        if len(parts) >= 4 and parts[2] == "blob":
+            user, repo, _, branch = parts[:4]
+            file_path = "/".join(parts[4:])
+            return (
+                f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
+            )
+    return url  # Return original if not a GitHub blob URL
+
+
+def get_file_from_url(url: str) -> Path:
+    """Download file from URL to a temporary file and return Path."""
+    # Convert GitHub blob URLs to raw URLs
+    actual_url = convert_github_url(url)
+
+    try:
+        response = requests.get(actual_url, timeout=30)
+        response.raise_for_status()
+
+        # Create a temporary file
+        temp_file = tempfile.NamedTemporaryFile(mode="wb", delete=False, suffix=".tmp")
+        temp_file.write(response.content)
+        temp_file.close()
+
+        return Path(temp_file.name)
+    except Exception as e:
+        raise ValueError(f"Failed to download file from {actual_url}: {e}") from e
+
+
+def is_url(path: str) -> bool:
+    """Check if the given string is a URL."""
+    parsed = urlparse(path)
+    return parsed.scheme in ("http", "https", "ftp")
