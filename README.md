@@ -3,8 +3,12 @@
 > A character encoding detective for text files and URLs - catch encoding issues before they evolve into problems!
 
 [![PyPI version](https://badge.fury.io/py/charminder.svg)](https://badge.fury.io/py/charminder)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI/CD Pipeline](https://github.com/nelsonwmoore/CharMinder/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/nelsonwmoore/CharMinder/actions/workflows/ci-cd.yml)
+[![codecov](https://codecov.io/github/nelsonwmoore/CharMinder/branch/main/graph/badge.svg)](https://codecov.io/github/nelsonwmoore/CharMinder)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 CharMinder is a powerful encoding validation tool that detects character encoding issues in text files with precise, character-level reporting. It supports both local files and remote URLs (including GitHub).
 
