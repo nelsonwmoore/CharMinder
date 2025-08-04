@@ -9,7 +9,7 @@ import click
 
 from .encoding_checker import check_encoding_issues
 from .models import Encoding
-from .reporting import print_encoding_report
+from .reporting import _get_symbols, print_encoding_report
 from .url_utils import get_file_from_url, is_url
 
 
@@ -41,27 +41,25 @@ def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None
     """
     exit_code = 0
     temp_files = []  # Track temporary files for cleanup
+    symbols = _get_symbols()
 
     try:
         for mdf_file in mdf_files:
             try:
-                # Handle URLs vs local files
                 if is_url(mdf_file):
                     print(f"Downloading {mdf_file}...")
                     file_path = get_file_from_url(mdf_file)
-                    temp_files.append(file_path)  # Track for cleanup
+                    temp_files.append(file_path)
                 else:
                     file_path = Path(mdf_file)
                     if not file_path.exists():
-                        print(f"✗ {mdf_file}: File not found")
+                        print(f"{symbols['cross']} {mdf_file}: File not found")
                         exit_code = 1
                         continue
 
-                # Check encoding issues
                 encoding_value = Encoding[encoding].value
                 is_valid, issues = check_encoding_issues(file_path, encoding_value)
 
-                # Print report
                 print_encoding_report(
                     mdf_file, issues, encoding_value, is_valid=is_valid
                 )
@@ -75,11 +73,10 @@ def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None
                         exit_code = 1
 
             except (OSError, UnicodeError, ValueError) as e:
-                print(f"✗ {mdf_file}: Error processing file - {e}")
+                print(f"{symbols['cross']} {mdf_file}: Error processing file - {e}")
                 exit_code = 1
 
     finally:
-        # Clean up temporary files
         for temp_file in temp_files:
             with suppress(Exception):
                 temp_file.unlink()

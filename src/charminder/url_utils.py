@@ -20,19 +20,17 @@ def convert_github_url(url: str) -> str:
             return (
                 f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
             )
-    return url  # Return original if not a GitHub blob URL
+    return url
 
 
 def get_file_from_url(url: str) -> Path:
     """Download file from URL to a temporary file and return Path."""
-    # Convert GitHub blob URLs to raw URLs
     actual_url = convert_github_url(url)
 
     try:
         response = requests.get(actual_url, timeout=30)
         response.raise_for_status()
 
-        # Create a temporary file
         with tempfile.NamedTemporaryFile(
             mode="wb",
             delete=False,

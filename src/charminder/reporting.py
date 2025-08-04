@@ -2,6 +2,21 @@
 
 from __future__ import annotations
 
+import sys
+
+
+def _get_symbols() -> dict[str, str]:
+    """Get appropriate symbols based on console encoding capability."""
+    try:
+        # Test if we can encode Unicode symbols
+        test_symbols = "✓⚠✗"
+        test_symbols.encode(sys.stdout.encoding or "utf-8")
+    except (UnicodeEncodeError, LookupError):
+        # Fallback to ASCII symbols
+        return {"check": "[OK]", "warning": "[WARN]", "cross": "[ERROR]"}
+    else:
+        return {"check": "✓", "warning": "⚠", "cross": "✗"}
+
 
 def print_encoding_report(
     file_path: str,
@@ -11,15 +26,20 @@ def print_encoding_report(
     is_valid: bool,
 ) -> None:
     """Print a detailed encoding report."""
+    symbols = _get_symbols()
+
     if is_valid and not issues:
-        print(f"✓ {file_path}: Valid {expected_encoding} encoding")
+        print(f"{symbols['check']} {file_path}: Valid {expected_encoding} encoding")
         return
 
     if is_valid and issues:
         # Only warnings
-        print(f"⚠ {file_path}: Valid {expected_encoding} encoding (with warnings)")
+        print(
+            f"{symbols['warning']} {file_path}: Valid {expected_encoding} "
+            "encoding (with warnings)"
+        )
     else:
-        print(f"✗ {file_path}: Invalid {expected_encoding} encoding")
+        print(f"{symbols['cross']} {file_path}: Invalid {expected_encoding} encoding")
 
     for issue in issues:
         if issue["type"] == "decode_error":

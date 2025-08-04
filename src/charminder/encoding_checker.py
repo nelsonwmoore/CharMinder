@@ -24,14 +24,12 @@ def check_encoding_issues(  # noqa: PLR0911, C901
     """
     issues = []
 
-    # Check if file exists first
     if not file_path.exists():
         return False, [
             {"type": "file_error", "message": f"File not found: {file_path}"},
         ]
 
     try:
-        # Use charset_normalizer to detect the actual encoding
         detection_result = from_path(file_path).best()
     except (OSError, UnicodeError, ValueError) as e:
         return False, [{"type": "file_error", "message": f"Error reading file: {e}"}]
@@ -45,9 +43,7 @@ def check_encoding_issues(  # noqa: PLR0911, C901
     expected_lower = expected_encoding.lower().replace("-", "").replace("_", "")
     detected_lower = detected_encoding.lower().replace("-", "").replace("_", "")
 
-    # Read the file content using the detected encoding first
     try:
-        # First try to read with detected encoding to get the actual content
         try:
             content = file_path.read_text(encoding=detected_encoding)
         except UnicodeDecodeError:
@@ -71,7 +67,6 @@ def check_encoding_issues(  # noqa: PLR0911, C901
                 )
                 return False, issues
 
-        # Check if we can encode each character to the expected encoding
         problematic_chars = []
         for line_num, line in enumerate(content.splitlines(), 1):
             for char_pos, char in enumerate(line):
@@ -94,7 +89,6 @@ def check_encoding_issues(  # noqa: PLR0911, C901
             issues.extend(problematic_chars)
             return False, issues
 
-        # Check if detected encoding differs significantly from expected
         if detected_lower != expected_lower and expected_lower not in detected_lower:
             issues.append(
                 {

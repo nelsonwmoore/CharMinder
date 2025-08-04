@@ -113,7 +113,7 @@ ignore = [
 convention = "google"
 
 [lint.per-file-ignores]
-"**/tests/*.py" = ["S101", "D103", "D100", "INP001", "ANN001", "ANN201"]
+"**/tests/*.py" = ["S101", "D103", "D100", "INP001", "ANN001", "ANN201", "ANN202"]
 "__init__.py" = ["E402", "F401", "F403", "F811"]
 "**/bin/*.py" = ["INP001"]
 
