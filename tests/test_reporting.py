@@ -8,7 +8,7 @@ class TestPrintEncodingReport:
 
     def test_valid_encoding_no_issues(self, capsys):
         """Test report for valid encoding with no issues."""
-        print_encoding_report("test.txt", True, [], "utf-8")
+        print_encoding_report("test.txt", [], "utf-8", is_valid=True)
 
         captured = capsys.readouterr()
         assert "✓ test.txt: Valid utf-8 encoding" in captured.out
@@ -25,7 +25,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", True, issues, "utf-8")
+        print_encoding_report("test.txt", issues, "utf-8", is_valid=True)
 
         captured = capsys.readouterr()
         assert "⚠ test.txt: Valid utf-8 encoding (with warnings)" in captured.out
@@ -46,7 +46,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", False, issues, "ascii")
+        print_encoding_report("test.txt", issues, "ascii", is_valid=False)
 
         captured = capsys.readouterr()
         assert "✗ test.txt: Invalid ascii encoding" in captured.out
@@ -64,7 +64,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", False, issues, "ascii")
+        print_encoding_report("test.txt", issues, "ascii", is_valid=False)
 
         captured = capsys.readouterr()
         assert "✗ test.txt: Invalid ascii encoding" in captured.out
@@ -79,7 +79,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", False, issues, "utf-8")
+        print_encoding_report("test.txt", issues, "utf-8", is_valid=False)
 
         captured = capsys.readouterr()
         assert "✗ test.txt: Invalid utf-8 encoding" in captured.out
@@ -94,7 +94,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", False, issues, "utf-8")
+        print_encoding_report("test.txt", issues, "utf-8", is_valid=False)
 
         captured = capsys.readouterr()
         assert "✗ test.txt: Invalid utf-8 encoding" in captured.out
@@ -128,7 +128,7 @@ class TestPrintEncodingReport:
             },
         ]
 
-        print_encoding_report("test.txt", False, issues, "ascii")
+        print_encoding_report("test.txt", issues, "ascii", is_valid=False)
 
         captured = capsys.readouterr()
         output = captured.out
@@ -141,7 +141,7 @@ class TestPrintEncodingReport:
     def test_url_path_in_report(self, capsys):
         """Test that URL paths are handled correctly in reports."""
         url = "https://example.com/test.txt"
-        print_encoding_report(url, True, [], "utf-8")
+        print_encoding_report(url, [], "utf-8", is_valid=True)
 
         captured = capsys.readouterr()
         assert f"✓ {url}: Valid utf-8 encoding" in captured.out
@@ -149,12 +149,12 @@ class TestPrintEncodingReport:
     def test_output_ends_with_newline(self, capsys):
         """Test that all reports end with a newline for proper formatting."""
         # Test valid case
-        print_encoding_report("test.txt", True, [], "utf-8")
+        print_encoding_report("test.txt", [], "utf-8", is_valid=True)
         captured = capsys.readouterr()
         assert captured.out.endswith("\n")
 
         # Test invalid case
         issues = [{"type": "file_error", "message": "Test error"}]
-        print_encoding_report("test.txt", False, issues, "utf-8")
+        print_encoding_report("test.txt", issues, "utf-8", is_valid=False)
         captured = capsys.readouterr()
         assert captured.out.endswith("\n\n")  # Extra newline after issue details

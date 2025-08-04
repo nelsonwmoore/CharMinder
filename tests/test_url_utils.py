@@ -88,7 +88,7 @@ class TestGetFileFromUrl:
     """Test file download functionality."""
 
     @responses.activate
-    def test_successful_download(self, temp_dir):
+    def test_successful_download(self):
         """Test successful file download."""
         url = "https://example.com/test.txt"
         content = b"Test file content"
@@ -105,7 +105,7 @@ class TestGetFileFromUrl:
         result_path.unlink()
 
     @responses.activate
-    def test_download_with_github_conversion(self, temp_dir):
+    def test_download_with_github_conversion(self):
         """Test download with GitHub blob URL conversion."""
         blob_url = "https://github.com/user/repo/blob/main/file.txt"
         expected_raw_url = "https://raw.githubusercontent.com/user/repo/main/file.txt"

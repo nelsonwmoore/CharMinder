@@ -2,6 +2,8 @@
 
 from charminder.models import Encoding
 
+EXPECTED_ENCODINGS = {"utf-8", "utf-16", "utf-32", "ascii"}
+
 
 class TestEncoding:
     """Test the Encoding enum."""
@@ -15,13 +17,12 @@ class TestEncoding:
 
     def test_encoding_enumeration(self):
         """Test that we can iterate over all encodings."""
-        expected_encodings = {"utf-8", "utf-16", "utf-32", "ascii"}
         actual_encodings = {encoding.value for encoding in Encoding}
-        assert actual_encodings == expected_encodings
+        assert actual_encodings == EXPECTED_ENCODINGS
 
     def test_encoding_count(self):
         """Test that we have the expected number of encodings."""
-        assert len(list(Encoding)) == 4
+        assert len(list(Encoding)) == len(EXPECTED_ENCODINGS)
 
     def test_encoding_string_conversion(self):
         """Test string conversion of encoding values."""

@@ -1,5 +1,6 @@
 """Tests for charminder.cli module."""
 
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -96,7 +97,7 @@ class TestCliMain:
         assert "✗" in result.output
 
     @responses.activate
-    def test_url_download_success(self, temp_dir):
+    def test_url_download_success(self):
         """Test successful URL download and processing."""
         url = "https://example.com/test.txt"
         content = "Hello world!\nThis is a test file."
@@ -145,7 +146,8 @@ class TestCliMain:
         # Test with each valid encoding
         for encoding in Encoding:
             result = self.runner.invoke(main, ["-f", "/dev/null", "-e", encoding.name])
-            # Should not fail due to invalid encoding choice (might fail for other reasons)
+            # Should not fail due to invalid encoding choice
+            # (might fail for other reasons)
             assert "Invalid value" not in result.output
 
     def test_invalid_encoding_parameter(self):
@@ -171,7 +173,7 @@ class TestCliMain:
         # Mock an exception in the encoding checker
         with patch(
             "charminder.cli.check_encoding_issues",
-            side_effect=Exception("Unexpected error"),
+            side_effect=OSError("Unexpected error"),
         ):
             result = self.runner.invoke(main, ["-f", str(test_file)])
 
@@ -211,12 +213,10 @@ class TestCliMain:
             rsps.add(responses.GET, url, body="URL content", status=200)
 
             # Track if any temp files exist before and after
-            import tempfile
-
             temp_dir = Path(tempfile.gettempdir())
             temp_files_before = list(temp_dir.glob("*.tmp"))
 
-            result = self.runner.invoke(main, ["-f", url, "-e", "UTF8"])
+            self.runner.invoke(main, ["-f", url, "-e", "UTF8"])
 
             temp_files_after = list(temp_dir.glob("*.tmp"))
 

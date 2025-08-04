@@ -14,7 +14,7 @@ def convert_github_url(url: str) -> str:
     parsed_url = urlparse(url)
     if parsed_url.netloc == "github.com":
         parts = parsed_url.path.strip("/").split("/")
-        if len(parts) >= 4 and parts[2] == "blob":
+        if len(parts) >= 4 and parts[2] == "blob":  # noqa: PLR2004
             user, repo, _, branch = parts[:4]
             file_path = "/".join(parts[4:])
             return (
@@ -33,13 +33,17 @@ def get_file_from_url(url: str) -> Path:
         response.raise_for_status()
 
         # Create a temporary file
-        temp_file = tempfile.NamedTemporaryFile(mode="wb", delete=False, suffix=".tmp")
-        temp_file.write(response.content)
-        temp_file.close()
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            delete=False,
+            suffix=".tmp",
+        ) as temp_file:
+            temp_file.write(response.content)
+            return Path(temp_file.name)
 
-        return Path(temp_file.name)
     except Exception as e:
-        raise ValueError(f"Failed to download file from {actual_url}: {e}") from e
+        msg = f"Failed to download file from {actual_url}: {e}"
+        raise ValueError(msg) from e
 
 
 def is_url(path: str) -> bool:

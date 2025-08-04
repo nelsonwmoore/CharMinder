@@ -11,7 +11,8 @@ class TestCheckEncodingIssues:
         is_valid, issues = check_encoding_issues(sample_utf8_file, "utf-8")
 
         assert is_valid is True
-        # Should only have encoding mismatch warning (charset_normalizer might detect as utf-8-sig or similar)
+        # Should only have encoding mismatch warning
+        # (charset_normalizer might detect as utf-8-sig or similar)
         error_issues = [i for i in issues if i["type"] != "encoding_mismatch"]
         assert len(error_issues) == 0
 
@@ -127,10 +128,9 @@ class TestCheckEncodingIssues:
         encode_errors = [i for i in issues if i["type"] == "encode_error"]
 
         # Should find multiple problematic characters
-        assert len(encode_errors) >= 3  # 🌍, 🎉, é
+        expected_characters = {"🌍", "🎉", "é"}
+        assert len(encode_errors) >= len(expected_characters)
 
         # Verify we get different characters
         characters = {error["character"] for error in encode_errors}
-        assert "🌍" in characters
-        assert "🎉" in characters
-        assert "é" in characters
+        assert expected_characters.issubset(characters)

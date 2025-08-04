@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from charset_normalizer import from_path
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def check_encoding_issues(
+
+def check_encoding_issues(  # noqa: PLR0911, C901
     file_path: Path,
     expected_encoding: str,
 ) -> tuple[bool, list[dict]]:
@@ -30,7 +33,7 @@ def check_encoding_issues(
     try:
         # Use charset_normalizer to detect the actual encoding
         detection_result = from_path(file_path).best()
-    except Exception as e:
+    except (OSError, UnicodeError, ValueError) as e:
         return False, [{"type": "file_error", "message": f"Error reading file: {e}"}]
 
     if detection_result is None:
@@ -59,7 +62,11 @@ def check_encoding_issues(
                         "type": "decode_error",
                         "encoding": expected_encoding,
                         "position": e.start,
-                        "message": f"Cannot decode byte {raw_content[e.start : e.start + 1]!r} at position {e.start}",
+                        "message": (
+                            "Cannot decode byte "
+                            f"{raw_content[e.start : e.start + 1]!r} "
+                            f"at position {e.start}",
+                        ),
                     },
                 )
                 return False, issues
@@ -95,12 +102,15 @@ def check_encoding_issues(
                     "detected": detected_encoding,
                     "expected": expected_encoding,
                     "confidence": detection_result.coherence,
-                    "message": f"Detected encoding '{detected_encoding}' differs from expected '{expected_encoding}'",
+                    "message": (
+                        f"Detected encoding '{detected_encoding}' "
+                        "differs from expected '{expected_encoding}'",
+                    ),
                 },
             )
             # This is a warning, not necessarily an error
 
         return len([i for i in issues if i["type"] != "encoding_mismatch"]) == 0, issues
 
-    except Exception as e:
+    except (OSError, UnicodeError, ValueError) as e:
         return False, [{"type": "file_error", "message": f"Error reading file: {e}"}]

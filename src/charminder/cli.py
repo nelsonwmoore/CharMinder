@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
 from pathlib import Path
 
 import click
@@ -16,7 +17,10 @@ from .url_utils import get_file_from_url, is_url
 @click.option(
     "-f",
     "--mdf-files",
-    help="MDF file(s) or URL(s) to check. Supports file paths and URLs. If you have multiple, use this for each file/URL.",
+    help=(
+        "MDF file(s) or URL(s) to check. Supports file paths and URLs. "
+        "If you have multiple, use this for each file/URL."
+    ),
     required=True,
     type=str,
     prompt=True,
@@ -58,7 +62,9 @@ def main(mdf_files: str | list[str], encoding: str = Encoding.UTF8.name) -> None
                 is_valid, issues = check_encoding_issues(file_path, encoding_value)
 
                 # Print report
-                print_encoding_report(mdf_file, is_valid, issues, encoding_value)
+                print_encoding_report(
+                    mdf_file, issues, encoding_value, is_valid=is_valid
+                )
 
                 # Set exit code if there are actual errors (not just warnings)
                 if not is_valid:
@@ -68,17 +74,15 @@ def main(mdf_files: str | list[str], encoding: str = Encoding.UTF8.name) -> None
                     if error_issues:
                         exit_code = 1
 
-            except Exception as e:
+            except (OSError, UnicodeError, ValueError) as e:
                 print(f"✗ {mdf_file}: Error processing file - {e}")
                 exit_code = 1
 
     finally:
         # Clean up temporary files
         for temp_file in temp_files:
-            try:
+            with suppress(Exception):
                 temp_file.unlink()
-            except Exception:
-                pass  # Ignore cleanup errors
 
     if exit_code != 0:
         raise SystemExit(exit_code)
