@@ -23,6 +23,7 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
     "types-requests>=2.28.0",
+    "types-click>=7.1.0",
 ]
 
 [project.scripts]
@@ -61,6 +62,10 @@ strict_equality = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "charset_normalizer.*"
+ignore_missing_imports = true
 
 [build-system]
 requires = ["hatchling"]

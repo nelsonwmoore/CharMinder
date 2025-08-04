@@ -67,10 +67,10 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v3
       
-    - name: Install linting tools
+    - name: Install dependencies and linting tools
       run: |
+        uv sync --extra dev --extra test
         uv tool install ruff
-        uv tool install mypy
         
     - name: Run ruff (format check)
       run: uv tool run ruff format --check .
@@ -79,9 +79,7 @@ jobs:
       run: uv tool run ruff check .
       
     - name: Run mypy (type checking)
-      run: |
-        uv sync --extra test
-        uv run mypy --install-types --non-interactive src/
+      run: uv run mypy src/
 
   build:
     name: Build Package

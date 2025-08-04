@@ -33,7 +33,7 @@ from .url_utils import get_file_from_url, is_url
     type=click.Choice([e.name for e in Encoding]),
     default=Encoding.UTF8.name,
 )
-def main(mdf_files: str | list[str], encoding: str = Encoding.UTF8.name) -> None:
+def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None:
     """
     Run the check_encoding script.
 
