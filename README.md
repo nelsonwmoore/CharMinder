@@ -1,6 +1,6 @@
 # 🔥 CharMinder
 
-> A character encoding detective for text files and URLs - catch encoding issues before they evolve into problems!
+> Catch encoding issues before they evolve into problems!
 
 [![PyPI version](https://badge.fury.io/py/charminder.svg)](https://badge.fury.io/py/charminder)
 [![CI/CD Pipeline](https://github.com/nelsonwmoore/CharMinder/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/nelsonwmoore/CharMinder/actions/workflows/ci-cd.yml)
