@@ -1,0 +1,90 @@
+name: 'CharMinder Encoding Check'
+description: 'Check character encoding issues in text files using CharMinder'
+author: 'Nelson Moore'
+
+inputs:
+  files:
+    description: 'Space-separated list of files or URLs to check (supports wildcards)'
+    required: true
+  encoding:
+    description: 'Encoding type to check for (UTF8, UTF16, UTF32, ASCII)'
+    required: false
+    default: 'UTF8'
+  python-version:
+    description: 'Python version to use'
+    required: false
+    default: '3.11'
+
+outputs:
+  result:
+    description: 'Result of the encoding check (success/failure)'
+    value: ${{ steps.charminder.outputs.result }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install CharMinder
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install charminder
+
+    - name: Run CharMinder
+      id: charminder
+      shell: bash
+      run: |
+        set -e
+        
+        # Convert space-separated files to array and expand wildcards
+        files_array=()
+        for pattern in ${{ inputs.files }}; do
+          # Use shell globbing to expand wildcards
+          for file in $pattern; do
+            if [ -e "$file" ]; then
+              files_array+=("$file")
+            elif [[ "$file" == http* ]]; then
+              # Handle URLs directly
+              files_array+=("$file")
+            fi
+          done
+        done
+        
+        # Check if we found any files
+        if [ ${#files_array[@]} -eq 0 ]; then
+          echo "ERROR: No files found matching the patterns: ${{ inputs.files }}"
+          echo "result=failure" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        echo "Found ${#files_array[@]} file(s) to check:"
+        printf '%s\n' "${files_array[@]}"
+        echo
+        
+        # Build charminder command
+        cmd="charminder"
+        for file in "${files_array[@]}"; do
+          cmd="$cmd -f \"$file\""
+        done
+        cmd="$cmd -e ${{ inputs.encoding }}"
+        
+        echo "Running: $cmd"
+        echo
+        
+        # Run charminder and capture result
+        if eval $cmd; then
+          echo "SUCCESS: All files passed encoding validation"
+          echo "result=success" >> $GITHUB_OUTPUT
+        else
+          echo "FAILED: Encoding validation failed"
+          echo "result=failure" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+branding:
+  icon: 'search'
+  color: 'orange'

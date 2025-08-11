@@ -40,6 +40,25 @@ charminder -f https://example.com/data.csv -e ASCII
 charminder -f https://github.com/user/repo/blob/main/data.json -e UTF8
 ```
 
+## 🚀 GitHub Action
+
+Use CharMinder in your CI/CD workflows! Add encoding validation to your GitHub Actions:
+
+```yaml
+- name: Check file encodings
+  uses: nelsonwmoore/CharMinder/.github/actions/charminder@main
+  with:
+    files: '*.txt *.md *.json'
+    encoding: 'UTF8'
+```
+
+**Quick Setup:**
+1. Copy [`.github/workflows/charminder-template.yml`](.github/workflows/charminder-template.yml) to your repository
+2. Customize the `files` and `encoding` inputs
+3. Commit and push - your files will be automatically validated!
+
+📖 [View full documentation and examples](.github/actions/charminder/README.md)
+
 ## 📖 Usage Examples
 
 ### Valid File
