@@ -24,7 +24,7 @@ class TestCliMain:
 
         assert result.exit_code == 0
         assert "Run the check_encoding script" in result.output
-        assert "--mdf-files" in result.output
+        assert "--files" in result.output
         assert "--encoding" in result.output
 
     def test_valid_local_file(self, sample_utf8_file):

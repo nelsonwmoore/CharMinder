@@ -16,9 +16,9 @@ from .url_utils import get_file_from_url, is_url
 @click.command()
 @click.option(
     "-f",
-    "--mdf-files",
+    "--files",
     help=(
-        "MDF file(s) or URL(s) to check. Supports file paths and URLs. "
+        "File(s) or URL(s) to check. Supports file paths and URLs. "
         "If you have multiple, use this for each file/URL."
     ),
     required=True,
@@ -33,7 +33,7 @@ from .url_utils import get_file_from_url, is_url
     type=click.Choice([e.name for e in Encoding]),
     default=Encoding.UTF8.name,
 )
-def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None:
+def main(files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None:
     """
     Run the check_encoding script.
 
@@ -44,25 +44,23 @@ def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None
     symbols = _get_symbols()
 
     try:
-        for mdf_file in mdf_files:
+        for file in files:
             try:
-                if is_url(mdf_file):
-                    print(f"Downloading {mdf_file}...")
-                    file_path = get_file_from_url(mdf_file)
+                if is_url(file):
+                    print(f"Downloading {file}...")
+                    file_path = get_file_from_url(file)
                     temp_files.append(file_path)
                 else:
-                    file_path = Path(mdf_file)
+                    file_path = Path(file)
                     if not file_path.exists():
-                        print(f"{symbols['cross']} {mdf_file}: File not found")
+                        print(f"{symbols['cross']} {file}: File not found")
                         exit_code = 1
                         continue
 
                 encoding_value = Encoding[encoding].value
                 is_valid, issues = check_encoding_issues(file_path, encoding_value)
 
-                print_encoding_report(
-                    mdf_file, issues, encoding_value, is_valid=is_valid
-                )
+                print_encoding_report(file, issues, encoding_value, is_valid=is_valid)
 
                 # Set exit code if there are actual errors (not just warnings)
                 if not is_valid:
@@ -73,7 +71,7 @@ def main(mdf_files: tuple[str, ...], encoding: str = Encoding.UTF8.name) -> None
                         exit_code = 1
 
             except (OSError, UnicodeError, ValueError) as e:
-                print(f"{symbols['cross']} {mdf_file}: Error processing file - {e}")
+                print(f"{symbols['cross']} {file}: Error processing file - {e}")
                 exit_code = 1
 
     finally:

@@ -1,4 +1,4 @@
-"""Check text encoding of MDF file for unexpected characters."""
+"""Check text encoding of text file for unexpected characters."""
 
 from charminder import main
 
