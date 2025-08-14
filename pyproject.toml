@@ -1,6 +1,6 @@
 [project]
 name = "charminder"
-version = "0.1.0"
+version = "0.1.1"
 description = "A character encoding detective for text files and URLs - catch encoding issues before they evolve into problems!"
 readme = "README.md"
 authors = [
