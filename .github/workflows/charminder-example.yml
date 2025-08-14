@@ -1,0 +1,88 @@
+name: 'CharMinder Example Workflow'
+
+# This is an example workflow showing how to use the CharMinder action
+# Users can copy this workflow to their own repositories and customize it
+
+on:
+  # Run on pushes to main branch
+  push:
+    branches: [ main ]
+  # Run on pull requests
+  pull_request:
+    branches: [ main ]
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      files:
+        description: 'Files to check (space-separated, supports wildcards)'
+        required: false
+        default: '*.txt *.md'
+      encoding:
+        description: 'Encoding to check for'
+        required: false
+        default: 'UTF8'
+        type: choice
+        options:
+        - UTF8
+        - UTF16
+        - UTF32
+        - ASCII
+
+jobs:
+  encoding-check:
+    name: 'Check File Encodings'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Example 1: Check specific files with UTF8 encoding
+      - name: Check UTF8 encoding on text files
+        uses: ./../../actions/charminder  # Use local action for this repo
+        # For external repos, use: nelsonwmoore/CharMinder/.github/actions/charminder@main
+        with:
+          files: '*.txt *.md README.md'
+          encoding: 'UTF8'
+
+      # Example 2: Check ASCII encoding on specific files
+      - name: Check ASCII encoding on source files
+        uses: ./../../actions/charminder
+        with:
+          files: 'src/**/*.py'
+          encoding: 'ASCII'
+        continue-on-error: true  # Don't fail the workflow if this step fails
+
+      # Example 3: Check files from manual trigger
+      - name: Check encoding (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        uses: ./../../actions/charminder
+        with:
+          files: ${{ github.event.inputs.files || '*.txt *.md' }}
+          encoding: ${{ github.event.inputs.encoding || 'UTF8' }}
+
+      # Example 4: Check remote URLs
+      - name: Check remote file encoding
+        uses: ./../../actions/charminder
+        with:
+          files: 'https://raw.githubusercontent.com/nelsonwmoore/CharMinder/main/README.md'
+          encoding: 'UTF8'
+        continue-on-error: true
+
+  # Example job showing how to use the action result
+  report-results:
+    name: 'Report Results'
+    runs-on: ubuntu-latest
+    needs: encoding-check
+    if: always()  # Run even if encoding-check fails
+    
+    steps:
+      - name: Report outcome
+        run: |
+          if [ "${{ needs.encoding-check.result }}" == "success" ]; then
+            echo "✅ All encoding checks passed!"
+          else
+            echo "❌ Some encoding checks failed. Check the logs above for details."
+          fi
+
+

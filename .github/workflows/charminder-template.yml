@@ -1,0 +1,28 @@
+# CharMinder Encoding Check Template
+# Copy this workflow to your repository's .github/workflows/ directory
+# Customize the 'files' and 'encoding' inputs as needed
+
+name: 'Encoding Check'
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  charminder:
+    name: 'Check File Encodings'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check file encodings
+        uses: nelsonwmoore/CharMinder/.github/actions/charminder@main
+        with:
+          files: '*.txt *.md *.json *.csv'  # Customize these file patterns
+          encoding: 'UTF8'  # Options: UTF8, UTF16, UTF32, ASCII
+
+
